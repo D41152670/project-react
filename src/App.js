@@ -6,44 +6,31 @@ class App extends Component
 {
   state = {
     counter: 0,
-    posts: [
-      {
-        id: 1,
-        title: "title 1",
-        body: "This is the body post 1"
-      },
-      {
-        id: 2,
-        title: "title 2",
-        body: "This is the body post 2"
-      },
-      {
-        id: 3,
-        title: "title 3",
-        body: "This is the body post 3"
-      },
-    ]
+    posts: []
   }
 
   componentDidMount() 
   {
-    this.handleTimeOut();
+    this.loadPosts();
   }
 
-  componentDidUpdate()
+  loadPosts =  async () =>
   {
-    /* this.handleTimeOut(); */
-  }
 
-  handleTimeOut = () =>
-  {
-    // Get the variable state
-    const { posts, counter } = this.state;
-    posts[0].title = "olá um novo titulo";
+    /* .then(Response => Response.json())
+    .then(posts => this.setState({posts})) */
+    const postsResponse = fetch('https://jsonplaceholder.typicode.com/posts');
+    const photosResponse = fetch('https://jsonplaceholder.typicode.com/photos')
 
-    setTimeout(() => {
-        this.setState({posts, counter: counter + 1});
-      }, 1000);
+    const [posts, photos] = await Promise.all([postsResponse, photosResponse]);
+    const postsJson = await posts.json();
+    const photosJson = await photos.json();
+
+    const postsAndPhotos = postsJson.map((post, index) => {
+      return { ...post, cover: photosJson[index].url }
+    })
+
+    this.setState({ posts: postsAndPhotos })
   }
 
   render()
@@ -52,15 +39,21 @@ class App extends Component
     const { posts, counter } = this.state;
 
     return (
-      <div className="App">
+      <section className="container">
+        <div className="posts">
         { posts.map( post => (
-          <div key={post.id}>
-            <h1 > { post.title } </h1>
-            <div> {post.body} </div>
-            <div> { counter } </div>
+          <div className="post" key={post.id} >
+            <img src={post.cover} alt={post.title} className="img" />
+            <div  className="post-content">
+              <h1 > { post.title } </h1>
+              <div> {post.body} </div>
+              <div> { counter } </div>
+            </div>
           </div>
         )) }
       </div>
+      </section>
+      
     );
   }
 }

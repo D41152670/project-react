@@ -6,6 +6,7 @@ class App extends Component
 {
   state = {
     counter: 0,
+    tituloSite: "Titulo do site",
     posts: []
   }
 
@@ -36,10 +37,11 @@ class App extends Component
   render()
   {
     // Get the variable state
-    const { posts, counter } = this.state;
+    const { posts, counter, tituloSite } = this.state;
 
     return (
       <section className="container">
+        <h1 className="titulo-site"> {tituloSite} </h1>
         <div className="posts">
         { posts.map( post => (
           <div className="post" key={post.id} >

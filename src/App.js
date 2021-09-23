@@ -1,6 +1,9 @@
 import './App.css';
 import { Component } from 'react';
 
+import { loadPosts } from './utils/load.posts';
+import { Posts } from './components/Posts';
+
 /* Main class extends component */
 class App extends Component 
 {
@@ -10,26 +13,13 @@ class App extends Component
     posts: []
   }
 
-  componentDidMount() 
+  async componentDidMount() 
   {
-    this.loadPosts();
+    await this.loadPosts();
   }
 
-  loadPosts =  async () =>
-  {
-
-    /* .then(Response => Response.json())
-    .then(posts => this.setState({posts})) */
-    const postsResponse = fetch('https://jsonplaceholder.typicode.com/posts');
-    const photosResponse = fetch('https://jsonplaceholder.typicode.com/photos')
-
-    const [posts, photos] = await Promise.all([postsResponse, photosResponse]);
-    const postsJson = await posts.json();
-    const photosJson = await photos.json();
-
-    const postsAndPhotos = postsJson.map((post, index) => {
-      return { ...post, cover: photosJson[index].url }
-    })
+  loadPosts = async () => {
+    const postsAndPhotos = await loadPosts();
 
     this.setState({ posts: postsAndPhotos })
   }
@@ -37,23 +27,12 @@ class App extends Component
   render()
   {
     // Get the variable state
-    const { posts, counter, tituloSite } = this.state;
+    const { posts, tituloSite } = this.state;
 
     return (
       <section className="container">
         <h1 className="titulo-site"> {tituloSite} </h1>
-        <div className="posts">
-        { posts.map( post => (
-          <div className="post" key={post.id} >
-            <img src={post.cover} alt={post.title} className="img" />
-            <div  className="post-content">
-              <h1 > { post.title } </h1>
-              <div> {post.body} </div>
-              <div> { counter } </div>
-            </div>
-          </div>
-        )) }
-      </div>
+        <Posts posts={posts} />
       </section>
       
     );
